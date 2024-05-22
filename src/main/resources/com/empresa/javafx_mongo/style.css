@@ -1,0 +1,51 @@
+/* styles.css */
+
+/* General styling */
+.root {
+    -fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -fx-background-color: #e8eaf6;
+}
+
+.label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #333;
+}
+
+.text-field {
+    -fx-font-size: 14px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdbdbd;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px;
+}
+
+.combo-box {
+    -fx-font-size: 14px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #bdbdbd;
+    -fx-border-radius: 4px;
+}
+
+.button {
+    -fx-font-size: 14px;
+    -fx-background-color: #1e88e5;
+    -fx-text-fill: #ffffff;
+    -fx-border-radius: 4px;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #1565c0;
+}
+
+/* Specific styling for grid pane and VBox */
+.grid-pane {
+    -fx-padding: 20;
+    -fx-hgap: 15;
+    -fx-vgap: 15;
+}
+
+.vbox {
+    -fx-spacing: 15;
+}

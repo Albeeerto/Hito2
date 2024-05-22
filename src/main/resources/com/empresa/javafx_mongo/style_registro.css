@@ -1,0 +1,31 @@
+/* Estilo para el fondo del contenedor principal */
+.root {
+    -fx-background-color: #f0f0f0; /* Color de fondo gris claro */
+}
+
+/* Estilo para los botones */
+.button {
+    -fx-background-color: #4CAF50; /* Color de fondo verde */
+    -fx-text-fill: white; /* Color del texto blanco */
+}
+
+/* Estilo para los campos de texto */
+.text-field {
+    -fx-background-color: #ffffff; /* Color de fondo blanco */
+}
+
+/* Estilo para las etiquetas */
+.label {
+    -fx-text-fill: #333333; /* Color del texto gris oscuro */
+}
+
+/* Estilo para los enlaces */
+.hyperlink {
+    -fx-text-fill: #1e90ff; /* Color del enlace azul */
+}
+
+/* Estilo para los mensajes de alerta */
+.alert {
+    -fx-background-color: #f44336; /* Color de fondo rojo */
+    -fx-text-fill: white; /* Color del texto blanco */
+}
