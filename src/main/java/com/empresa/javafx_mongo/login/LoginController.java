@@ -1,20 +1,26 @@
 package com.empresa.javafx_mongo.login;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
+import org.mindrot.jbcrypt.BCrypt;
+import com.empresa.javafx_mongo.login.CaptchaGenerator;
 
 public class LoginController {
 
@@ -25,6 +31,12 @@ public class LoginController {
     private PasswordField passwordField;
 
     @FXML
+    private TextField captchaField;
+
+    @FXML
+    private ImageView captchaImageView;
+
+    @FXML
     private Button loginButton;
 
     @FXML
@@ -32,22 +44,30 @@ public class LoginController {
 
     private ConexionMysql conexion;
 
+    private CaptchaGenerator captchaGenerator;
+    private String captchaText;
+
     public LoginController() {
         conexion = new ConexionMysql();
+        captchaGenerator = new CaptchaGenerator();
     }
 
     @FXML
     private void initialize() {
-        // Puedes realizar inicializaciones adicionales aquí
+        generateNewCaptcha();
     }
 
     @FXML
     private void handleLoginButtonAction() {
         String username = usernameField.getText();
         String password = passwordField.getText();
+        String captchaInput = captchaField.getText();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            showAlert("Error", "Por favor, ingresa un nombre de usuario y una contraseña.");
+        if (username.isEmpty() || password.isEmpty() || captchaInput.isEmpty()) {
+            showAlert("Error", "Por favor, complete todos los campos.");
+        } else if (!captchaInput.equals(captchaText)) {
+            showAlert("Error", "El texto CAPTCHA no coincide.");
+            generateNewCaptcha(); // Generar un nuevo CAPTCHA si el anterior es incorrecto
         } else {
             if (validateLogin(username, password)) {
                 openHelloView();
@@ -59,11 +79,25 @@ public class LoginController {
 
     @FXML
     private void handleRegisterLinkAction() {
-        // Aquí puedes agregar la lógica para abrir el formulario de registro
-        System.out.println("Abrir formulario de registro");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/empresa/javafx_mongo/registro.fxml"));
+            Parent root = loader.load();
+
+            // Mostrar la ventana registro.fxml
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+            // Cerrar la ventana actual de inicio de sesión (opcional, si deseas mantener la ventana de login abierta, puedes comentar esta línea)
+            Stage currentStage = (Stage) registerLink.getScene().getWindow();
+            currentStage.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "No se pudo abrir la ventana de registro.");
+        }
     }
 
-    private boolean validateLogin(String username, String password) {
+    public boolean validateLogin(String username, String password) {
         String query = "SELECT * FROM usuarios WHERE username = ?";
         try {
             Connection conn = conexion.getConnection();
@@ -92,8 +126,7 @@ public class LoginController {
     }
 
     private boolean verifyPassword(String plainPassword, String hashedPassword) {
-        // Implementa la lógica para verificar la contraseña encriptada aquí (por ejemplo, usando bcrypt)
-        return plainPassword.equals(hashedPassword); // Aquí se está comparando la contraseña sin encriptar con la almacenada en la base de datos
+        return BCrypt.checkpw(plainPassword, hashedPassword);
     }
 
     private void openHelloView() {
@@ -112,6 +145,18 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudo abrir la ventana hello-view.");
+        }
+    }
+
+    private void generateNewCaptcha() {
+        captchaText = captchaGenerator.createCaptchaText();
+        try {
+            InputStream captchaImageStream = captchaGenerator.createCaptchaImage(captchaText);
+            Image captchaImage = new Image(captchaImageStream);
+            captchaImageView.setImage(captchaImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "No se pudo generar la imagen CAPTCHA.");
         }
     }
 }

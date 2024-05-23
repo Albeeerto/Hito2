@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
@@ -28,6 +29,9 @@
                 <TextField fx:id="usernameField" styleClass="text-field" />
                 <Label text="Contraseña:" />
                 <PasswordField fx:id="passwordField" styleClass="text-field" />
+                <ImageView fx:id="captchaImageView" />
+                <Label text="Ingrese el texto de la imagen:" />
+                <TextField fx:id="captchaField" />
                 <Button fx:id="loginButton" onAction="#handleLoginButtonAction" text="Iniciar Sesión" styleClass="button" />
                 <Hyperlink fx:id="registerLink" onAction="#handleRegisterLinkAction" text="Registrarse" styleClass="hyperlink" />
             </children>

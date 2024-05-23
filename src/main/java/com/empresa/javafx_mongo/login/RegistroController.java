@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class RegistroController {
 
@@ -103,7 +104,6 @@ public class RegistroController {
     }
 
     private String hashPassword(String password) {
-        // Implementa la lógica para encriptar la contraseña aquí (por ejemplo, usando BCrypt)
-        return password; // Aquí solo se está devolviendo la contraseña sin encriptar
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

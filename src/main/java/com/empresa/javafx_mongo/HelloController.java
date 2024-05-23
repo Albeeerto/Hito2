@@ -80,31 +80,44 @@ public class HelloController {
 
         tableView.setItems(dataList);
         loadData();
+
+        // Añadir listener para la selección de filas en la tabla
+        tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                fillFields(newValue);
+            }
+        });
     }
 
     @FXML
     protected void handleSaveButtonAction() {
         String nombre = nombreField.getText();
-        int edad = Integer.parseInt(edadField.getText());
+        String edadText = edadField.getText();
         String sexo = sexoComboBox.getValue();
         String alturaText = alturaField.getText().replace(",", ".");
-        double altura = Double.parseDouble(alturaText);
         String aficiones = aficionesField.getText();
 
-        if (nombre == null || nombre.isEmpty() || sexo == null || sexo.isEmpty() || aficiones == null || aficiones.isEmpty()) {
+        if (nombre == null || nombre.isEmpty() || edadText.isEmpty() || sexo == null || sexo.isEmpty() || alturaText.isEmpty() || aficiones == null || aficiones.isEmpty()) {
             showAlert("Input Error", "Por favor, completa todos los campos.");
             return;
         }
 
-        Document document = new Document("nombre", nombre)
-                .append("edad", edad)
-                .append("sexo", sexo)
-                .append("altura", altura)
-                .append("aficiones", aficiones);
-        collection.insertOne(document);
-        showAlert("Success", "Datos guardados en MongoDB.");
-        clearFields();
-        loadData();
+        try {
+            int edad = Integer.parseInt(edadText);
+            double altura = Double.parseDouble(alturaText);
+
+            Document document = new Document("nombre", nombre)
+                    .append("edad", edad)
+                    .append("sexo", sexo)
+                    .append("altura", altura)
+                    .append("aficiones", aficiones);
+            collection.insertOne(document);
+            showAlert("Success", "Datos guardados en MongoDB.");
+            clearFields();
+            loadData();
+        } catch (NumberFormatException e) {
+            showAlert("Input Error", "Edad y altura deben ser números válidos.");
+        }
     }
 
     @FXML
@@ -134,29 +147,33 @@ public class HelloController {
         DataModel selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             String nombre = nombreField.getText();
-            int edad = Integer.parseInt(edadField.getText());
+            String edadText = edadField.getText();
             String sexo = sexoComboBox.getValue();
             String alturaText = alturaField.getText().replace(",", ".");
-            double altura = Double.parseDouble(alturaText);
             String aficiones = aficionesField.getText();
 
-            if (nombre == null || nombre.isEmpty() || sexo == null || sexo.isEmpty() || aficiones == null || aficiones.isEmpty()) {
+            if (nombre == null || nombre.isEmpty() || edadText.isEmpty() || sexo == null || sexo.isEmpty() || alturaText.isEmpty() || aficiones == null || aficiones.isEmpty()) {
                 showAlert("Input Error", "Por favor, completa todos los campos.");
                 return;
             }
 
-            Document updatedDocument = new Document("nombre", nombre)
-                    .append("edad", edad)
-                    .append("sexo", sexo)
-                    .append("altura", altura)
-                    .append("aficiones", aficiones);
-
             try {
+                int edad = Integer.parseInt(edadText);
+                double altura = Double.parseDouble(alturaText);
+
+                Document updatedDocument = new Document("nombre", nombre)
+                        .append("edad", edad)
+                        .append("sexo", sexo)
+                        .append("altura", altura)
+                        .append("aficiones", aficiones);
+
                 ObjectId objectId = new ObjectId(selectedItem.getId());
                 collection.updateOne(new Document("_id", objectId), new Document("$set", updatedDocument));
                 showAlert("Success", "Data updated in MongoDB.");
                 clearFields();
                 loadData();
+            } catch (NumberFormatException e) {
+                showAlert("Input Error", "Edad y altura deben ser números válidos.");
             } catch (IllegalArgumentException e) {
                 showAlert("Error", "Invalid ID format.");
             }
@@ -203,6 +220,14 @@ public class HelloController {
                 ))
                 .collect(Collectors.toList());
         dataList.addAll(dataModels);
+    }
+
+    private void fillFields(DataModel dataModel) {
+        nombreField.setText(dataModel.getNombre());
+        edadField.setText(String.valueOf(dataModel.getEdad()));
+        sexoComboBox.setValue(dataModel.getSexo());
+        alturaField.setText(String.valueOf(dataModel.getAltura()));
+        aficionesField.setText(dataModel.getAficiones());
     }
 
     private void showAlert(String title, String content) {
